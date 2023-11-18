@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import json
+from .chat import chatCall
 
 def main():
     # Title of your app
@@ -14,7 +15,7 @@ def main():
     st.header('GPT Chatbot')
     user_input = st.text_input("Ask the Financial Assistant:")
     # Placeholder response, replace with GPT-generated response later
-    st.text_area("Response:", value="Hello! I'm your financial assistant.", height=100)
+    st.text_area("Response:", value=chatCall(user_input), height=100)
 
     # Section for Financial Charts
     st.header('Financial Charts')
@@ -38,4 +39,5 @@ def main():
     st.json(sample_json_data)
 
 if __name__ == "__main__":
-    main()
+    #main()
+    print (main())
