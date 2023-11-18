@@ -24,8 +24,7 @@ def chatCall(question):
     return msg
 
 # Call the chat function and print the response message
-response_message = chatCall()
-print(response_message)
+
 
 
 

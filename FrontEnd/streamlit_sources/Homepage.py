@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import json
-from .chat import chatCall
+from chat import chatCall
 
 def main():
     # Title of your app

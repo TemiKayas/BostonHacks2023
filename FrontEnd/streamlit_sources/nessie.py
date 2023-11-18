@@ -1,108 +1,106 @@
 import requests
 import json
 
-API_KEY = 'c4339d9d4f473684a342b04bcbb2ccf1'
+api_key = 'c4339d9d4f473684a342b04bcbb2ccf1'
 BASE_URL = 'http://api.nessieisreal.com'
 
-def create_account(user_id, account_type, fullname, rewards, balance):
-    url = f"{BASE_URL}/customers/{user_id}/accounts?key={API_KEY}"
-    headers = {'Content-Type': 'application/json'}
-    payload = {
-        "type": account_type,
-        "nickname": fullname,
-        "rewards": rewards,
-        "balance": balance
+def create_customer(api_key, first_name, last_name, street_number, street_name, city, state, zip_code):
+    url = f"http://api.nessieisreal.com/customers?key={api_key}"
+    headers = {
+        'Content-Type': 'application/json',
     }
-    response = requests.post(url, data=json.dumps(payload), headers=headers)
-
+    payload = {
+        "first_name": first_name,
+        "last_name": last_name,
+        "address": {
+            "street_number": street_number,
+            "street_name": street_name,
+            "city": city,
+            "state": state,
+            "zip": zip_code
+        }
+    }
+    response = requests.post(url, json=payload, headers=headers)
     if response.status_code == 201:
         return response.json()
     else:
-        return response.text
-
-def create_bill(account_id, amount, payee, payment_date, recurring_date, expense_type):
-    url = f"{BASE_URL}/accounts/{account_id}/bills?key={API_KEY}"
-
-    headers = {'Content-Type': 'application/json'}
-
-    payload = {
-        "status": "pending",
-        "payee": payee,
-        "nickname": expense_type,
-        "payment_date": payment_date,
-        "recurring_date": recurring_date,
-        "payment_amount": amount
+        return "Error"
+    
+def create_checking_account(api_key, customer_id, nickname, rewards, balance):
+    url = f"http://api.nessieisreal.com/customers/{customer_id}/accounts?key={api_key}"
+    headers = {
+        'Content-Type': 'application/json',
     }
-
-    response = requests.post(url, data=json.dumps(payload), headers=headers)
-
+    payload = {
+        "type": "Checking",
+        "nickname": nickname,
+        "rewards": rewards,
+        "balance": balance
+    }
+    response = requests.post(url, json=payload, headers=headers)
     if response.status_code == 201:
-        return response.json()  
+        return response.json()
     else:
-        return response.text 
+        return "Error"
 
-def get_bills_from_account(account_id):
-    url = f"{BASE_URL}/accounts/{account_id}/bills?key={API_KEY}"
+
+def create_bill(api_key, account_id, status, payee, payment_date, payment_amount):
+    url = f"http://api.nessieisreal.com/accounts/{account_id}/bills?key={api_key}"
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    payload = {
+        "status": status,
+        "payee": payee,
+        "payment_date": payment_date,
+        "payment_amount": payment_amount
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    print(response.json())
+    if response.status_code == 201:
+        return response.json()
+    else:
+        return "Error"
+    
+
+def get_all_bills_for_accountDONOTUSE(api_key, account_id):
+    url = f"http://api.nessieisreal.com/accounts/{account_id}/bills?key={api_key}"
+    response = requests.get(url)
+    print(response.json())
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return "Error"
+
+def get_customer_account(customer_id, api_key):
+    url = f"http://api.nessieisreal.com/customers/{customer_id}/accounts?key={api_key}"
+    
     response = requests.get(url)
 
     if response.status_code == 200:
         return response.json()
     else:
-        return response.text    
+        return f"Error: {response.status_code} - {response.text}"
 
-
-def deposit_to_account(account_id, amount):
-    url = f"{BASE_URL}/accounts/{account_id}/deposits?key={API_KEY}"
-    headers = {'Content-Type': 'application/json'}
-    payload = {
-        "medium": "balance", 
-        "transaction_date": "2023-11-18",  
-        "status": "pending",
-        "amount": amount,
-    }
-    response = requests.post(url, data=json.dumps(payload), headers=headers)
-
-    if response.status_code == 201:
-        return response.json()
+def get_checking_account_number(api_key, customer_id):
+    url = f"http://api.nessieisreal.com/customers/{customer_id}/accounts?key={api_key}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        accounts = response.json()
+        for account in accounts:
+            if account['type'] == 'Checking':
+                return account['_id']
+        return "No checking account found"
     else:
-        return response.text
-
-
-def get_billing_history_of_all_users():
-    customers_response = requests.get(f"{BASE_URL}/customers?key={API_KEY}")
-    if customers_response.status_code != 200:
-        return 'error'
-
-    customers = customers_response.json()
-    all_bills = {}
-
-    for customer in customers:
-        customer_id = customer['_id']
-        accounts_response = requests.get(f"{BASE_URL}/customers/{customer_id}/accounts?key={API_KEY}")
-        if accounts_response.status_code == 200:
-            accounts = accounts_response.json()
-            for account in accounts:
-                account_id = account['_id']
-                bills_response = requests.get(f"{BASE_URL}/accounts/{account_id}/bills?key={API_KEY}")
-                if bills_response.status_code == 200:
-                    bills = bills_response.json()
-                    all_bills[account_id] = bills
-
-    return all_bills
-
-def main():
-    create_account(1, 'checking', 'Henry Van Hove', 0, 1000)
-    create_account(2, 'checking', 'John Doe', 0, 1000)
-    create_account(3, 'checking', 'Anthony Hopkins', 0, 1000)
-    create_account(4, 'checking', 'Artemios Kayas', 0, 1000)
-    create_account(5, 'checking', 'Evan', 0, 1000)
-    create_account(6, 'checking', 'Brad Pitt', 0, 1000)
-    create_account(7, 'checking', 'Joe Biden', 0, 1000)
-    create_account(8, 'checking', 'George Santos', 0, 1000)
-    create_account(9, 'checking', 'The Rock', 0, 1000)
-    create_account(10, 'checking', 'Sam Altman', 0, 1000)
-    create_bill(1, 100, 'Dominoes Pizza', 11-18-2023, 0, 'food')
+        return "Error accessing API"
     
-
-if __name__ == "__main__":
-    main()
+def get_billing_account_history(api_key, account_id):
+    url = f"http://api.nessieisreal.com/accounts/{account_id}/bills?key={api_key}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(f"billing_history.json", "w") as file:
+            json.dump(response.json(), file)
+        return "Billing history saved to file"
+    else:
+        return "Error accessing API"
+        
