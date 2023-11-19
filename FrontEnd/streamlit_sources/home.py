@@ -62,6 +62,7 @@ def run():
                 background-repeat: no-repeat;
                 background-size: cover;
             }}
+            
             .css-1d391kg {{
                 background-color: {secondary_background_color};
                 border-radius: 10px;
@@ -143,7 +144,7 @@ def run():
         with col1:
             # Display the orange octopus image
             chat_octo = 'https://cdn.discordapp.com/attachments/1175474476822040629/1175578924303007815/orangeocto.png?ex=656bbe30&is=65594930&hm=2dd6cbd7691b360fabdbdd96ab1e582fd37717935c810711a2a90ba66971967e&'
-            
+            st.markdown(f'<div class="centered-image"><img src="{chat_octo}" alt="Friendly Octopus Advisor" width="500" height="500"></div>', unsafe_allow_html=True)
 
         with col2:
             # Placeholder for the pie chart
@@ -160,18 +161,18 @@ def run():
             keys = list(labels.keys())
             values = list(labels.values())
 
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(40, 40))
             ax.set_facecolor('none')
             fig.set_facecolor('none')
             ax.axis('equal')
             ax.set_frame_on(False)
 
-            wedges, texts, autotexts = ax.pie(values, labels=keys, autopct='%1.5f%%', labeldistance=1)
+            wedges, texts, autotexts = ax.pie(values, labels=None, autopct='%.2f%%', labeldistance=1)
             ax.legend(wedges, keys, title="Category", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
-            plt.setp(autotexts, size=8, weight="bold")
+            plt.rcParams["font.size"] = 50
+            plt.title("Spending % by Category", fontsize=150)
 
             st.pyplot(fig)
-        st.markdown(f'<div class="centered-image"><img src="{chat_octo}" alt="Friendly Octopus Advisor" width="500" height="500"></div>', unsafe_allow_html=True)
         st.markdown(f"<div style='text-align: center; font-size: 2em;'> Sup Squidude! I'm your financial advisor Captain Octavian! </div>", unsafe_allow_html=True)
         st.markdown(f"<div style='text-align: center; font-size: 1.5em;'> Ask me anything about your account below: </div>", unsafe_allow_html=True)
         # Modify chat section to use the stored account number
